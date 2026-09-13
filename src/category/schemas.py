@@ -1,6 +1,17 @@
 from datetime import datetime
-from typing import List, Optional
-from pydantic import BaseModel
+from typing import List
+from pydantic import BaseModel, ConfigDict, Field
+
+class SubCategorySchema(BaseModel):
+    id: int
+    createdAt: datetime
+    name: str
+    slug: str
+    order: int
+
+    parentId: int | None = None
+
+    model_config = ConfigDict(from_attributes=True)
 
 class CategorySchema(BaseModel):
     id: int
@@ -9,7 +20,20 @@ class CategorySchema(BaseModel):
     slug: str
     order: int
 
-class CreateCategorySchema(BaseModel):
+    parentId: int | None = None
+    subcategories: List[SubCategorySchema] = Field(
+        default_factory=list
+    )
+
+    model_config = ConfigDict(from_attributes=True)
+
+CategorySchema.model_rebuild()
+
+class CategoryCreateSchema(BaseModel):
     name: str
-    order: Optional[int] = None
-    subCategories: Optional[List] # TODO: subCategoryDto[]
+    parentId: int | None = None
+
+class CategoryUpdateSchema(BaseModel):
+    name: str
+    order: int | None = None
+    parentId: int | None = None

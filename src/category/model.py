@@ -1,6 +1,6 @@
 from datetime import datetime
-from sqlalchemy import func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import ForeignKey, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.db import Base
 
 
@@ -13,20 +13,18 @@ class Category(Base):
     slug: Mapped[str] = mapped_column(unique=True)
     order: Mapped[int]
 
+    parentId: Mapped[int | None] = mapped_column(
+        ForeignKey("categories.id"),
+        nullable=True,
+        index=True,
+    )
 
-# model Subcategory {
-#   id         Int       @id @default(autoincrement())
-#   name       String    @unique
-#   slug       String    @unique
-#   order      Int
-
-#   products   Product[]
-#   category   Category  @relation(fields: [categoryId], references: [id])
-#   categoryId Int       @map("category_id")
-# }
-    
+    subcategories: Mapped[list["Category"]] = relationship(
+        "Category",
+        order_by="Category.order",
+        lazy='selectin'
+    )
 
 # model Category {
 #   products      Product[]
-#   subCategories Subcategory[]
 # }

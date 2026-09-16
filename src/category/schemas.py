@@ -1,10 +1,13 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
+from product.schemas import ProductSchema
 from pydantic import BaseModel, ConfigDict, Field
+from product.model import Product
 
 class SubCategorySchema(BaseModel):
     id: int
     createdAt: datetime
+    
     name: str
     slug: str
     order: int
@@ -16,6 +19,7 @@ class SubCategorySchema(BaseModel):
 class CategorySchema(BaseModel):
     id: int
     createdAt: datetime
+
     name: str
     slug: str
     order: int

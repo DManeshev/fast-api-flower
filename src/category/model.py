@@ -1,7 +1,12 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.db import Base
+
+
+if TYPE_CHECKING:
+    from src.product.model import Product
 
 
 class Category(Base):
@@ -21,10 +26,11 @@ class Category(Base):
 
     subcategories: Mapped[list["Category"]] = relationship(
         "Category",
-        order_by="Category.order",
+        order_by="Category.order.desc()",
         lazy='selectin'
     )
 
-# model Category {
-#   products      Product[]
-# }
+    products: Mapped[list["Product"]] = relationship(
+        back_populates="category",
+        order_by="Product.createdAt"
+    )

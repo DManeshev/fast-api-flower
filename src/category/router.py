@@ -26,23 +26,6 @@ async def get_all_categories(session: SessionDep):
     """ Return all categories """
     return await get_all(session=session)
 
-
-@router.get('/subcategories', response_model=list[SubCategorySchema])
-async def get_subcategories(
-    session: SessionDep,
-    category_id: PrimaryKey
-):
-    """ Return subcategory by category_id """
-    category = await get_by_id(session=session, category_id=category_id)
-
-    if not category:
-        raise HTTPException(
-            status_code=404,
-            detail={"msg": 'Категория не найдена'}
-        )
-
-    return category.subcategories
-
     
 @router.get("/{category_id}", response_model=CategorySchema)
 async def get_category(category_id: PrimaryKey, session: SessionDep):
@@ -96,7 +79,7 @@ async def create_category(
     return category
 
 
-@router.post('/update/{id}', response_model=CategorySchema)
+@router.post('/update/{category_id}', response_model=CategorySchema)
 async def update_category(
     session: SessionDep,
     category_id: PrimaryKey,

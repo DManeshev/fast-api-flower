@@ -6,6 +6,7 @@ from sqlalchemy import pool
 
 from alembic import context
 from src.category.model import Category # noqa
+from src.product.model import Product # noqa
 from src.db import Base
 
 config = context.config

@@ -1,10 +1,10 @@
 from category.model import Category
-from category.schemas import CategoryCreateSchema, CategoryUpdateSchema, SubCategorySchema
+from category.schemas import CategoryCreateSchema, CategoryUpdateSchema
 from db import PrimaryKey, SessionDep
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 from slugify import slugify
-from sqlalchemy.orm import joinedload, selectinload
 
 async def get_all(*, session: SessionDep) -> list[Category]:
     result = await session.execute((
@@ -65,7 +65,7 @@ async def create(
     await session.commit()
     await session.refresh(
         category, 
-        attribute_names=["subcategories"]
+        attribute_names=["subcategories", "products"]
     )
 
     return category

@@ -5,7 +5,6 @@ from fastapi import APIRouter, HTTPException
 from product.schemas import ProductCreateSchema, ProductSchema
 from product.service import by_id, by_slug, create, delete, get_all, get_by_category, update
 
-
 router = APIRouter()
 
 @router.get("", response_model=list[ProductSchema])
@@ -13,14 +12,12 @@ async def get_all_products(session: SessionDep):
     """ Get ALL Products """
     return await get_all(session=session)
 
-
 @router.get("/by-category", response_model=list[ProductSchema])
 async def get_products_by_categories(
     session: SessionDep,
     category_slug: str,
 ):
     return await get_by_category(session=session, category_slug=category_slug)
-
 
 @router.get("/{product_id}", response_model=ProductSchema)
 async def get_product_by_id(
@@ -37,7 +34,6 @@ async def get_product_by_id(
         )
     
     return product
-
 
 @router.get("/by-slug/{slug}", response_model=ProductSchema)
 async def get_product_by_slug(
@@ -65,7 +61,7 @@ async def create_product(
     product = await create(session=session, product_in=product_in)
     return product
 
-# TODO: ADD AUTH
+# TODO: ADD AUTH 
 @router.post("/update/{product_id}", response_model=ProductSchema)
 async def update_product(
     session: SessionDep,

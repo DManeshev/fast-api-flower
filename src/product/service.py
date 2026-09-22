@@ -1,4 +1,6 @@
 from db import PrimaryKey, SessionDep
+from flowers.model import Flower
+from flowers.service import (get_by_ids as get_flowers_by_ids)
 from product.model import Product
 from product.schemas import ProductCreateSchema
 from sqlalchemy import select
@@ -47,23 +49,34 @@ async def by_slug(
         .where(Product.slug == slug)
         .options(selectinload(Product.flowers))
     ))
-    
+
     return product.scalars().first()
 
 async def create(
     session: SessionDep,
     product_in: ProductCreateSchema
 ) -> Product:
+    flowers_ids = set[int](product_in.flowers)
+
+    flowers = []
+
+    if flowers_ids:
+        flowers = await get_flowers_by_ids(session=session, ids=flowers_ids)
+        
     product: Product = Product(
-        **product_in.model_dump(exclude_unset=True),
-        slug=slugify(product_in.name)
+        **product_in.model_dump(exclude_unset=True, exclude={'flowers'}),
+        slug=slugify(product_in.name),
+        flowers=flowers
     )
 
     try:
         session.add(product)
         
         await session.commit()
-        await session.refresh(product)
+        await session.refresh(
+            product,
+            attribute_names=["flowers"]
+        )
 
         return product
     except SQLAlchemyError as error:
@@ -75,17 +88,30 @@ async def update(
     product: Product,
     product_in: ProductCreateSchema,
 ) -> Product:
-    product_dict = product_in.model_dump(exclude_unset=True)
+    values = product_in.model_dump(
+        exclude_unset=True,
+        exclude={'flowers'}
+    )
+
+    for key, value in values.items():
+        if key == 'name':
+            setattr(product, 'slug', slugify(value))
+
+        setattr(product, key, value)
+
+    if 'flowers' in product_in.model_dump() and product_in.flowers:
+        flowers_ids = set[int](product_in.flowers)
+        list_flowers = await get_flowers_by_ids(session=session, ids=flowers_ids)
+
+        product.flowers = list[Flower](list_flowers)
 
     try:
-        for key, value in product_dict.items():
-            if key == 'name':
-                setattr(product, 'slug', slugify(value))
-
-            setattr(product, key, value)
-
         await session.commit()
-        await session.refresh(product)
+
+        await session.refresh(
+            product,
+            attribute_names=["flowers"]
+        )
 
         return product
     except SQLAlchemyError as error:

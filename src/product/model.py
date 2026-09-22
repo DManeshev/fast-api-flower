@@ -42,6 +42,9 @@ class Product(Base):
         secondary="product_flowers"
     )
 
+    def __repr__(self) -> str:
+        return f"Product(id={self.id}, name={self.name}, price={self.price}, images={self.images})"
+
     # TODO
     # orderItems    OrderItem[]
 

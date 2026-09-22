@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional
 from flowers.schemas import FlowerSchema
 from product.model import ProductStatusEnum
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 class ProductSchema(BaseModel):
     id: int
@@ -33,4 +33,4 @@ class ProductCreateSchema(BaseModel):
     status: Optional[ProductStatusEnum] | None = ProductStatusEnum.IN_STOCK
     categoryId: int
 
-    # TODO: flowers:
+    flowers: list[int] = Field(default_factory=list)

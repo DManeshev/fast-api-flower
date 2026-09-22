@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Optional
+from flowers.schemas import FlowerSchema
 from product.model import ProductStatusEnum
 from pydantic import BaseModel, ConfigDict
 
@@ -18,7 +19,7 @@ class ProductSchema(BaseModel):
     status: ProductStatusEnum
 
     categoryId: int
-    # TODO: flowers:
+    flowers: list[FlowerSchema]
 
     model_config = ConfigDict(from_attributes=True)
 

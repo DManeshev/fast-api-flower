@@ -5,15 +5,13 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.enums import BaseEnum
 from src.db import Base
 
-
 if TYPE_CHECKING:
     from src.category.model import Category
-
+    from src.flowers.model import Flower
 
 class ProductStatusEnum(BaseEnum):
     IN_STOCK = 'В наличии'
     TO_ORDER = 'Под заказ'
-
 
 class Product(Base):
     __tablename__ = "products"
@@ -39,8 +37,23 @@ class Product(Base):
         back_populates="products"
     )
 
+    flowers: Mapped[list["Flower"]] = relationship(
+        back_populates="products",
+        secondary="product_flowers"
+    )
 
-# model Product {
-#   orderItems    OrderItem[]
-#   flowers       Flower[]          @relation("FlowerToProduct")
-# }
+    # TODO
+    # orderItems    OrderItem[]
+
+class ProductFlowers(Base):
+    __tablename__ = 'product_flowers'
+
+    productId: Mapped[int] = mapped_column(
+        ForeignKey("products.id", ondelete="CASCADE"),
+        primary_key=True
+    )
+
+    flowerId: Mapped[int] = mapped_column(
+        ForeignKey("flowers.id", ondelete="CASCADE"),
+        primary_key=True
+    )

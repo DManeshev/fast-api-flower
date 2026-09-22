@@ -7,6 +7,9 @@ class Settings(BaseSettings):
     DB_USER: str = ''
     DB_PASSWORD: str = ''
 
+    YANDEX_ACCESS_KEY: str = ''
+    YANDEX_SECRET_KEY: str = ''
+
     @property
     def DATABASE_URL(self):
         return (f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}@"

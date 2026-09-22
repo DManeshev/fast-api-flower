@@ -6,7 +6,8 @@ from sqlalchemy import pool
 
 from alembic import context
 from src.category.model import Category # noqa
-from src.product.model import Product # noqa
+from src.product.model import Product, ProductFlowers # noqa
+from src.flowers.model import Flower # noqa
 from src.db import Base
 
 config = context.config
@@ -20,6 +21,8 @@ config.set_main_option(
 )
 
 target_metadata = Base.metadata
+
+print("TABLES:", Base.metadata.tables.keys())
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.

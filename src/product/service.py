@@ -1,15 +1,15 @@
-from category.model import Category
 from db import PrimaryKey, SessionDep
 from product.model import Product
 from product.schemas import ProductCreateSchema
 from sqlalchemy import select
 from slugify import slugify
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import joinedload, selectinload
+from sqlalchemy.orm import selectinload
 
 async def get_all(session: SessionDep) -> list[Product]:
     products = await session.execute((
         select(Product)
+        .options(selectinload(Product.flowers))
     ))
 
     return list[Product](products.scalars().all())
@@ -21,6 +21,7 @@ async def get_by_category(
     products = await session.execute((
         select(Product)
         .filter(Product.category.has(slug=category_slug))
+        .options(selectinload(Product.flowers))
     ))
 
     return list[Product](products.scalars().all())
@@ -29,19 +30,24 @@ async def by_id(
     session: SessionDep,
     product_id: PrimaryKey
 ) -> Product | None:
-    product: Product | None = await session.get(Product, product_id)
-    return product
+    product = await session.execute((
+        select(Product)
+        .where(Product.id == product_id)
+        .options(selectinload(Product.flowers))
+    ))
+
+    return product.scalars().first()
 
 async def by_slug(
     session: SessionDep,
     slug: str
 ) -> Product | None:
-    query = (
+    product = await session.execute((
         select(Product)
-        .filter_by(slug=slug)
-    )
-
-    product = await session.execute(query)
+        .where(Product.slug == slug)
+        .options(selectinload(Product.flowers))
+    ))
+    
     return product.scalars().first()
 
 async def create(
